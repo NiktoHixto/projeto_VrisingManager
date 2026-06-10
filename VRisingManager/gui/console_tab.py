@@ -1,0 +1,2 @@
+class ConsoleTab:
+    pass
