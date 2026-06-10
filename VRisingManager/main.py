@@ -1,3 +1,4 @@
 from gui.app import App
 
-App().mainloop()
+if __name__ == "__main__":
+    App().mainloop()
