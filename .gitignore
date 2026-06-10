@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testes
+tests/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Ambiente virtual
+venv/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
