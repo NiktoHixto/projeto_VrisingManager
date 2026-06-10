@@ -12,6 +12,7 @@ build/
 dist/
 *.spec
 *.exe
+executaveis/
 
 # Ambiente virtual
 venv/
