@@ -11,6 +11,7 @@ tests/
 build/
 dist/
 *.spec
+*.exe
 
 # Ambiente virtual
 venv/
