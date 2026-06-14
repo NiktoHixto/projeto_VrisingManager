@@ -9,10 +9,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 VRISING_DIR = os.path.join(PROJECT_DIR, "VRisingManager")
 MAIN_FILE = os.path.join(VRISING_DIR, "main.py")
-DIST_DIR = os.path.join(PROJECT_DIR, "dist")
-BUILD_DIR = os.path.join(PROJECT_DIR, "build", "pyinstaller")
-SPEC_DIR = os.path.join(PROJECT_DIR, "build", "pyinstaller")
-OUTPUT_DIR = os.path.join(PROJECT_DIR, "executaveis")
+DIST_DIR = os.path.join(PROJECT_DIR, "executaveis")
+BUILD_DIR = os.path.join(PROJECT_DIR, "temp_build")
+SPEC_DIR = os.path.join(PROJECT_DIR, "temp_build")
 
 
 def ensure_pyinstaller():
@@ -42,10 +41,12 @@ def build_executable(clean=False):
 
     if clean and os.path.exists(DIST_DIR):
         shutil.rmtree(DIST_DIR)
+    if clean and os.path.exists(BUILD_DIR):
+        shutil.rmtree(BUILD_DIR)
 
     os.makedirs(BUILD_DIR, exist_ok=True)
     os.makedirs(SPEC_DIR, exist_ok=True)
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(DIST_DIR, exist_ok=True)
 
     command = [
         sys.executable,
@@ -57,7 +58,7 @@ def build_executable(clean=False):
         "--name",
         "VRisingManager",
         "--distpath",
-        OUTPUT_DIR,
+        DIST_DIR,
         "--workpath",
         BUILD_DIR,
         "--specpath",
@@ -72,9 +73,9 @@ def build_executable(clean=False):
     if result.returncode != 0:
         raise RuntimeError("Falha ao gerar o executável.")
 
-    executable = os.path.join(OUTPUT_DIR, "VRisingManager.exe")
+    executable = os.path.join(DIST_DIR, "VRisingManager.exe")
     if not os.path.exists(executable):
-        executable = os.path.join(OUTPUT_DIR, "VRisingManager")
+        executable = os.path.join(DIST_DIR, "VRisingManager")
 
     return executable
 
