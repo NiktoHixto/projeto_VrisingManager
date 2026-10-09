@@ -23,14 +23,22 @@ class ServerManager:
         env = os.environ.copy()
         env["SteamAppId"] = "1604030"
 
+        popen_kwargs = {
+            "cwd": self.server_dir,
+            "env": env,
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.STDOUT,
+            "text": True,
+            "bufsize": 1,
+            "stdin": subprocess.DEVNULL,
+        }
+
+        if os.name == "nt" and hasattr(subprocess, "CREATE_NO_WINDOW"):
+            popen_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
         self.proc = subprocess.Popen(
             [exe, "-persistentDataPath", ".\\save-data", "-serverName", server_name, "-saveName", "world1"],
-            cwd=self.server_dir,
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
+            **popen_kwargs,
         )
 
         threading.Thread(target=self._reader, args=(on_line, on_status), daemon=True).start()
