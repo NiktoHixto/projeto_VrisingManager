@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-from data.theme import PRETO2, VERMELHO, VERMELHO_HOVER
+from data.theme import FUNDO, PAINEL, PAINEL_2, VERMELHO, VERMELHO_HOVER
 
 
 class ServerTab:
@@ -11,73 +11,99 @@ class ServerTab:
         self.on_save = on_save
         self.build()
 
+    def section_title(self, parent, title):
+        header = ctk.CTkFrame(parent, fg_color=PAINEL_2, corner_radius=0)
+        header.pack(fill="x", pady=(0, 8))
+        ctk.CTkLabel(header, text=title, font=("Segoe UI", 15, "bold"), anchor="w", text_color="#F4F5F7").pack(anchor="w", padx=12, pady=10)
+        return header
+
     def build(self):
+        outer = ctk.CTkFrame(self.parent, fg_color=FUNDO)
+        outer.pack(fill="both", expand=True, padx=14, pady=14)
+
         self.available_worlds = self.config_manager.discover_worlds()
         self.profile_name_var = ctk.StringVar(value=self.config_manager.active_profile)
-        self.profile_combo = ctk.CTkComboBox(self.parent, values=list(self.config_manager.profiles.keys()), variable=self.profile_name_var)
-        self.profile_combo.pack(fill="x", padx=10, pady=(10, 5))
 
-        profile_row = ctk.CTkFrame(self.parent)
-        profile_row.pack(fill="x", padx=10, pady=5)
+        profile_frame = self.section_title(outer, "Perfil do servidor")
+        self.profile_combo = ctk.CTkComboBox(profile_frame, values=list(self.config_manager.profiles.keys()), variable=self.profile_name_var, width=260, corner_radius=0, border_color=VERMELHO)
+        self.profile_combo.pack(fill="x", padx=12, pady=(0, 10))
+
+        profile_row = ctk.CTkFrame(profile_frame, fg_color=FUNDO, corner_radius=0)
+        profile_row.pack(fill="x", padx=12, pady=(0, 12))
 
         self.profile_label = ctk.CTkEntry(profile_row)
         self.profile_label.insert(0, self.config_manager.active_profile)
-        self.profile_label.pack(side="left", fill="x", expand=True, padx=(0, 5))
         self.style_entry(self.profile_label)
+        self.profile_label.pack(side="left", fill="x", expand=True, padx=(0, 8))
 
-        ctk.CTkButton(profile_row, text="Salvar Perfil", fg_color=VERMELHO, hover_color=VERMELHO_HOVER, command=self.save_profile).pack(side="left")
-        ctk.CTkButton(profile_row, text="Carregar", command=self.load_selected_profile).pack(side="left", padx=(5, 0))
+        ctk.CTkButton(profile_row, text="Salvar Perfil", fg_color=VERMELHO, hover_color=VERMELHO_HOVER, command=self.save_profile, width=120, corner_radius=0).pack(side="left", padx=(0, 8))
+        ctk.CTkButton(profile_row, text="Carregar", command=self.load_selected_profile, width=90, corner_radius=0).pack(side="left")
 
-        ctk.CTkLabel(self.parent, text="Nome do Servidor").pack(anchor="w", padx=10)
-        self.name = ctk.CTkEntry(self.parent)
+        server_frame = self.section_title(outer, "Configuração do host")
+        basic_grid = ctk.CTkFrame(server_frame, fg_color=FUNDO, corner_radius=0)
+        basic_grid.pack(fill="both", padx=12, pady=(0, 12))
+
+        ctk.CTkLabel(basic_grid, text="Nome do Servidor", text_color="#E8EBF0").grid(row=0, column=0, sticky="w", padx=(0, 12), pady=(0, 6))
+        self.name = ctk.CTkEntry(basic_grid)
         self.name.insert(0, self.config_manager.host.get("Name", ""))
         self.style_entry(self.name)
-        self.name.pack(fill="x", padx=10, pady=5)
+        self.name.grid(row=0, column=1, sticky="ew", pady=(0, 6))
 
-        ctk.CTkLabel(self.parent, text="Mapa / Save disponível").pack(anchor="w", padx=10)
-        self.save_combo = ctk.CTkComboBox(self.parent, values=self.available_worlds, width=250)
+        ctk.CTkLabel(basic_grid, text="Senha", text_color="#E8EBF0").grid(row=1, column=0, sticky="w", padx=(0, 12), pady=(0, 6))
+        self.password = ctk.CTkEntry(basic_grid, show="*")
+        self.password.insert(0, self.config_manager.host.get("Password", ""))
+        self.style_entry(self.password)
+        self.password.grid(row=1, column=1, sticky="ew", pady=(0, 6))
+
+        ctk.CTkLabel(basic_grid, text="Jogadores Máximos", text_color="#E8EBF0").grid(row=2, column=0, sticky="w", padx=(0, 12), pady=(0, 6))
+        self.max_users = ctk.CTkEntry(basic_grid)
+        self.max_users.insert(0, str(self.config_manager.host.get("MaxConnectedUsers", 20)))
+        self.style_entry(self.max_users)
+        self.max_users.grid(row=2, column=1, sticky="ew", pady=(0, 6))
+
+        basic_grid.columnconfigure(1, weight=1)
+
+        world_frame = self.section_title(outer, "Mapa / Save")
+        self.save_combo = ctk.CTkComboBox(world_frame, values=self.available_worlds, width=260, corner_radius=0, border_color=VERMELHO)
         self.save_combo.set(self.config_manager.host.get("SaveName", self.available_worlds[0]))
-        self.save_combo.pack(fill="x", padx=10, pady=5)
+        self.save_combo.pack(fill="x", padx=12, pady=(0, 10))
 
-        world_row = ctk.CTkFrame(self.parent)
-        world_row.pack(fill="x", padx=10, pady=5)
+        world_row = ctk.CTkFrame(world_frame, fg_color=FUNDO, corner_radius=0)
+        world_row.pack(fill="x", padx=12, pady=(0, 12))
         self.save_name = ctk.CTkEntry(world_row)
         self.save_name.insert(0, self.config_manager.host.get("SaveName", self.available_worlds[0]))
         self.style_entry(self.save_name)
-        self.save_name.pack(side="left", fill="x", expand=True, padx=(0, 5))
-        ctk.CTkButton(world_row, text="Atualizar Saves", command=self.refresh_worlds).pack(side="left")
+        self.save_name.pack(side="left", fill="x", expand=True, padx=(0, 8))
+        ctk.CTkButton(world_row, text="Atualizar Saves", command=self.refresh_worlds, width=120, corner_radius=0).pack(side="left")
 
-        ctk.CTkLabel(self.parent, text="Senha").pack(anchor="w", padx=10)
-        self.password = ctk.CTkEntry(self.parent, show="*")
-        self.password.insert(0, self.config_manager.host.get("Password", ""))
-        self.style_entry(self.password)
-        self.password.pack(fill="x", padx=10, pady=5)
+        network_frame = self.section_title(outer, "Rede")
+        net_grid = ctk.CTkFrame(network_frame, fg_color=FUNDO, corner_radius=0)
+        net_grid.pack(fill="both", padx=12, pady=(0, 12))
 
-        ctk.CTkLabel(self.parent, text="Jogadores Máximos").pack(anchor="w", padx=10)
-        self.max_users = ctk.CTkEntry(self.parent)
-        self.max_users.insert(0, str(self.config_manager.host.get("MaxConnectedUsers", 20)))
-        self.style_entry(self.max_users)
-        self.max_users.pack(fill="x", padx=10, pady=5)
-
-        ctk.CTkLabel(self.parent, text="Porta do Jogo").pack(anchor="w", padx=10)
-        self.game_port = ctk.CTkEntry(self.parent)
+        ctk.CTkLabel(net_grid, text="Porta do Jogo", text_color="#E8EBF0").grid(row=0, column=0, sticky="w", padx=(0, 12), pady=(0, 6))
+        self.game_port = ctk.CTkEntry(net_grid)
         self.game_port.insert(0, str(self.config_manager.host.get("GamePort", 9876)))
         self.style_entry(self.game_port)
-        self.game_port.pack(fill="x", padx=10, pady=5)
+        self.game_port.grid(row=0, column=1, sticky="ew", pady=(0, 6))
 
-        ctk.CTkLabel(self.parent, text="Porta de Query").pack(anchor="w", padx=10)
-        self.query_port = ctk.CTkEntry(self.parent)
+        ctk.CTkLabel(net_grid, text="Porta de Query", text_color="#E8EBF0").grid(row=1, column=0, sticky="w", padx=(0, 12), pady=(0, 6))
+        self.query_port = ctk.CTkEntry(net_grid)
         self.query_port.insert(0, str(self.config_manager.host.get("QueryPort", 9877)))
         self.style_entry(self.query_port)
-        self.query_port.pack(fill="x", padx=10, pady=5)
+        self.query_port.grid(row=1, column=1, sticky="ew", pady=(0, 6))
+
+        net_grid.columnconfigure(1, weight=1)
 
         ctk.CTkButton(
-            self.parent,
+            outer,
             text="Salvar Configurações",
             fg_color=VERMELHO,
             hover_color=VERMELHO_HOVER,
             command=self.on_save,
-        ).pack(pady=10)
+            height=42,
+            width=240,
+            corner_radius=0,
+        ).pack(pady=(12, 4))
 
     def refresh_worlds(self):
         current_value = self.save_name.get().strip() or self.save_combo.get().strip()

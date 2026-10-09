@@ -5,7 +5,7 @@ import customtkinter as ctk
 from core.config_manager import ConfigManager
 from core.paths import FALLBACK_GAME_FILE, FALLBACK_HOST_FILE, GAME_FILE, HOST_FILE, SERVER_DIR, SETTINGS_DIR
 from core.server_manager import ServerManager
-from data.theme import VERMELHO, VERMELHO_HOVER
+from data.theme import FUNDO, PAINEL, PAINEL_2, PRETO2, VERMELHO, VERMELHO_HOVER
 from gui.console_tab import ConsoleTab
 from gui.gameplay_tab import GameplayTab
 from gui.server_tab import ServerTab
@@ -23,7 +23,9 @@ class App(ctk.CTk):
             pass
 
         self.title("V Rising Manager")
-        self.geometry("1100x750")
+        self.geometry("1180x780")
+        self.minsize(980, 680)
+        self.configure(fg_color=FUNDO)
 
         ctk.set_appearance_mode("dark")
 
@@ -39,12 +41,18 @@ class App(ctk.CTk):
         self.server_manager = ServerManager(SERVER_DIR)
         self.steamid = ""
 
-        self.status_var = ctk.StringVar(value="Status: Offline")
-        self.status_label = ctk.CTkLabel(self, textvariable=self.status_var, font=("Segoe UI", 18, "bold"), text_color="#FF4444")
-        self.status_label.pack(pady=5)
+        self.header = ctk.CTkFrame(self, fg_color=PAINEL, corner_radius=0)
+        self.header.pack(fill="x", padx=14, pady=(14, 8))
 
-        self.tabs = ctk.CTkTabview(self)
-        self.tabs.pack(fill="both", expand=True, padx=10, pady=10)
+        self.header_title = ctk.CTkLabel(self.header, text="V Rising Manager", font=("Segoe UI", 26, "bold"), text_color="#F5F5F5")
+        self.header_title.pack(anchor="w", padx=18, pady=(18, 4))
+
+        self.status_var = ctk.StringVar(value="Status: Offline")
+        self.status_label = ctk.CTkLabel(self.header, textvariable=self.status_var, font=("Segoe UI", 13, "bold"), text_color="#FF4444")
+        self.status_label.pack(anchor="w", padx=18, pady=(0, 18))
+
+        self.tabs = ctk.CTkTabview(self, fg_color=PAINEL_2, segmented_button_selected_color=VERMELHO, segmented_button_unselected_color=PRETO2, corner_radius=0)
+        self.tabs.pack(fill="both", expand=True, padx=14, pady=(0, 14))
 
         self.tab_server = self.tabs.add("Servidor")
         self.tab_game = self.tabs.add("Gameplay")
@@ -60,7 +68,7 @@ class App(ctk.CTk):
             self.set_status(f"Status: Diretório do servidor detectado: {SERVER_DIR}", "#FFD700")
 
     def style_entry(self, entry):
-        entry.configure(fg_color="#1A1A1A", border_color="#8B0000")
+        entry.configure(fg_color=PRETO2, border_color=VERMELHO, text_color="#F5F5F5")
 
     def set_status(self, text, color):
         self.status_var.set(text)
