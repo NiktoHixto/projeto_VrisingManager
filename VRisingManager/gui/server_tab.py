@@ -24,7 +24,16 @@ class ServerTab:
         self.available_worlds = self.config_manager.discover_worlds()
         self.profile_name_var = ctk.StringVar(value=self.config_manager.active_profile)
 
-        profile_frame = self.section_title(outer, "Perfil do servidor")
+        two_columns = ctk.CTkFrame(outer, fg_color=FUNDO)
+        two_columns.pack(fill="both", expand=True)
+
+        left_column = ctk.CTkFrame(two_columns, fg_color=FUNDO)
+        left_column.pack(side="left", fill="both", expand=True, padx=(0, 8))
+
+        right_column = ctk.CTkFrame(two_columns, fg_color=FUNDO)
+        right_column.pack(side="left", fill="both", expand=True, padx=(8, 0))
+
+        profile_frame = self.section_title(left_column, "Perfil do servidor")
         self.profile_combo = ctk.CTkComboBox(profile_frame, values=list(self.config_manager.profiles.keys()), variable=self.profile_name_var, width=260, corner_radius=0, border_color=VERMELHO)
         self.profile_combo.pack(fill="x", padx=12, pady=(0, 10))
 
@@ -39,7 +48,7 @@ class ServerTab:
         ctk.CTkButton(profile_row, text="Salvar Perfil", fg_color=VERMELHO, hover_color=VERMELHO_HOVER, command=self.save_profile, width=120, corner_radius=0).pack(side="left", padx=(0, 8))
         ctk.CTkButton(profile_row, text="Carregar", command=self.load_selected_profile, width=90, corner_radius=0).pack(side="left")
 
-        server_frame = self.section_title(outer, "Configuração do host")
+        server_frame = self.section_title(left_column, "Configuração do host")
         basic_grid = ctk.CTkFrame(server_frame, fg_color=FUNDO, corner_radius=0)
         basic_grid.pack(fill="both", padx=12, pady=(0, 12))
 
@@ -63,7 +72,7 @@ class ServerTab:
 
         basic_grid.columnconfigure(1, weight=1)
 
-        world_frame = self.section_title(outer, "Mapa / Save")
+        world_frame = self.section_title(right_column, "Mapa / Save")
         self.save_combo = ctk.CTkComboBox(world_frame, values=self.available_worlds, width=260, corner_radius=0, border_color=VERMELHO)
         self.save_combo.set(self.config_manager.host.get("SaveName", self.available_worlds[0]))
         self.save_combo.pack(fill="x", padx=12, pady=(0, 10))
@@ -76,7 +85,7 @@ class ServerTab:
         self.save_name.pack(side="left", fill="x", expand=True, padx=(0, 8))
         ctk.CTkButton(world_row, text="Atualizar Saves", command=self.refresh_worlds, width=120, corner_radius=0).pack(side="left")
 
-        network_frame = self.section_title(outer, "Rede")
+        network_frame = self.section_title(right_column, "Rede")
         net_grid = ctk.CTkFrame(network_frame, fg_color=FUNDO, corner_radius=0)
         net_grid.pack(fill="both", padx=12, pady=(0, 12))
 
