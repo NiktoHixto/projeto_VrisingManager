@@ -9,9 +9,28 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 VRISING_DIR = os.path.join(PROJECT_DIR, "VRisingManager")
 MAIN_FILE = os.path.join(VRISING_DIR, "main.py")
+REQUIREMENTS_FILE = os.path.join(VRISING_DIR, "requirements.txt")
 DIST_DIR = os.path.join(PROJECT_DIR, "executaveis")
 BUILD_DIR = os.path.join(PROJECT_DIR, "temp_build")
 SPEC_DIR = os.path.join(PROJECT_DIR, "temp_build")
+
+
+def ensure_project_dependencies():
+    try:
+        import customtkinter  # noqa: F401
+        return True
+    except ModuleNotFoundError:
+        pass
+
+    if not os.path.isfile(REQUIREMENTS_FILE):
+        raise FileNotFoundError(f"Arquivo de requisitos não encontrado: {REQUIREMENTS_FILE}")
+
+    print("Dependências do projeto não encontradas. Instalando...")
+    install = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-r", REQUIREMENTS_FILE],
+        check=False,
+    )
+    return install.returncode == 0
 
 
 def ensure_pyinstaller():
@@ -57,6 +76,10 @@ def build_executable(clean=False):
         "--clean",
         "--name",
         "VRisingManager",
+        "--collect-all",
+        "customtkinter",
+        "--hidden-import",
+        "customtkinter",
         "--distpath",
         DIST_DIR,
         "--workpath",
@@ -90,6 +113,9 @@ def main():
         help="Remove a build antiga antes de gerar uma nova versão.",
     )
     args = parser.parse_args()
+
+    if not ensure_project_dependencies():
+        raise RuntimeError("Não foi possível instalar as dependências do projeto.")
 
     if not ensure_pyinstaller():
         raise RuntimeError("Não foi possível instalar o PyInstaller.")
