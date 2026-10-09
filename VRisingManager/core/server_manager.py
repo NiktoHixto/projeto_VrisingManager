@@ -9,7 +9,7 @@ class ServerManager:
         self.proc = None
         self.steamid = ""
 
-    def start(self, server_name, on_line=None, on_status=None):
+    def start(self, server_name, save_name="world1", game_port=9876, query_port=9877, on_line=None, on_status=None):
         if self.proc:
             return self.proc
 
@@ -36,10 +36,21 @@ class ServerManager:
         if os.name == "nt" and hasattr(subprocess, "CREATE_NO_WINDOW"):
             popen_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-        self.proc = subprocess.Popen(
-            [exe, "-persistentDataPath", ".\\save-data", "-serverName", server_name, "-saveName", "world1"],
-            **popen_kwargs,
-        )
+        arguments = [
+            exe,
+            "-persistentDataPath",
+            ".\\save-data",
+            "-serverName",
+            server_name,
+            "-saveName",
+            save_name,
+            "-gamePort",
+            str(game_port),
+            "-queryPort",
+            str(query_port),
+        ]
+
+        self.proc = subprocess.Popen(arguments, **popen_kwargs)
 
         threading.Thread(target=self._reader, args=(on_line, on_status), daemon=True).start()
         return self.proc

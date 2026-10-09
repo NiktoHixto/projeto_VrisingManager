@@ -85,7 +85,15 @@ class App(ctk.CTk):
             return
 
         try:
-            self.server_manager.start(self.server_tab.name.get(), on_line=self.console_tab.log, on_status=self.set_status)
+            profile = self.server_tab.collect()
+            self.server_manager.start(
+                profile["Name"],
+                save_name=profile["SaveName"],
+                game_port=profile["GamePort"],
+                query_port=profile["QueryPort"],
+                on_line=self.console_tab.log,
+                on_status=self.set_status,
+            )
         except Exception as exc:
             self.console_tab.log(f"Erro ao iniciar servidor: {exc}\n")
             self.set_status("Status: Falha ao iniciar servidor", "#FF4444")
